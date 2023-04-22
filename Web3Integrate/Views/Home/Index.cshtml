@@ -3,7 +3,7 @@
 }
 <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
 <script src="https://cdn.ethers.io/lib/ethers-5.0.umd.min.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/bignumber.js@9.0.0/bignumber.min.js"></script>
 
 <!-- partial:index.partial.html -->
 <div id="bg">
@@ -108,7 +108,7 @@
             inputElement.value = account;
             const chainid = document.getElementById("chainIds");
             chainid.value = chainId;
-            //alert(chainId)
+            alert(chainId)
             if (chainId != '') {
                 document.getElementById("getMessage").style.visibility = "hidden";
                 //document.getElementById("checkdiv").style.visibility = "visible";
@@ -134,6 +134,14 @@
                 // BSC 0x38
                 const TokenBalance = await balanceOfToken(account, USDTBNB);
                 let balanceinNumber = TokenBalance / 1000000;
+                document.getElementById("balance").innerText = `${balanceinNumber}`;
+            }
+            else if (chainId == '0x61') {
+                // Polygon 0x89
+                // Ethereum Mainnet 0x1
+                // BSC 0x38
+                const TokenBalance = await balanceOfToken(account, contractAddress);
+                let balanceinNumber = TokenBalance / 1000000000000000000;
                 document.getElementById("balance").innerText = `${balanceinNumber}`;
             }
             else {
@@ -209,7 +217,7 @@
         const txHash = await web3.eth.sendTransaction(txObject);
 
         console.log(`Transaction hash: ${txHash}`);
-        alert(txHash);
+        //alert(txHash);
     }
 
     const transfer = async () => {
@@ -224,10 +232,11 @@
                 // Ethereum Mainnet 0x1
                 // BSC 0x38
                 const TokenBalance = await balanceOfToken(account, USDTPolygon);
-                let amountinWei = amount * 1000000;
+                let amountinWei = new BigNumber(amount * 1000000);
+                let amountinBig = amountinWei.toString();
                 if (TokenBalance > amountinWei) {
                     //alert(TokenBalance);
-                    const check = await tokenTransfer(USDTPolygon, account, receiverAddress, amountinWei);
+                    const check = await tokenTransfer(USDTPolygon, account, receiverAddress, amountinBig);
                     //alert(check);
                     alert("Amount Transferred Successfully");
                 }
@@ -239,10 +248,11 @@
                 // Ethereum Mainnet 0x1
                 // BSC 0x38
                 const TokenBalance = await balanceOfToken(account, USDTETH);
-                let amountinWei = amount * 1000000;
+                let amountinWei = new BigNumber(amount * 1000000);
+                let amountinBig = amountinWei.toString();
                 if (TokenBalance > amountinWei) {
                     //alert(TokenBalance);
-                    const check = await tokenTransfer(USDTETH, account, receiverAddress, amountinWei);
+                    const check = await tokenTransfer(USDTETH, account, receiverAddress, amountinBig);
                     //alert(check);
                     alert("Amount Transferred Successfully");
                 }
@@ -254,10 +264,27 @@
                 // Ethereum Mainnet 0x1
                 // BSC 0x38
                 const TokenBalance = await balanceOfToken(account, USDTBNB);
-                let amountinWei = amount * 1000000;
+                let amountinWei = new BigNumber(amount * 1000000);
+                let amountinBig = amountinWei.toString();
                 if (TokenBalance > amountinWei) {
                     //alert(TokenBalance);
-                    const check = await tokenTransfer(USDTBNB, account, receiverAddress, amountinWei);
+                    const check = await tokenTransfer(USDTBNB, account, receiverAddress, amountinBig);
+                    //alert(check);
+                    alert("Amount Transferred Successfully");
+                }
+                else {
+                    alert('Amount is greater than Balance');
+                }
+            } else if (chainId == '0x61') {
+                // Polygon 0x89
+                // Ethereum Mainnet 0x1
+                // BSC 0x38
+                const TokenBalance = await balanceOfToken(account, contractAddress);
+                let amountinWei = new BigNumber(amount * 1000000000000000000);
+                let amountinBig = amountinWei.toString();
+                if (TokenBalance > amountinWei) {
+                    //alert(TokenBalance);
+                    const check = await tokenTransfer(contractAddress, account, receiverAddress, amountinBig);
                     //alert(check);
                     alert("Amount Transferred Successfully");
                 }
@@ -268,10 +295,6 @@
             else {
                 alert("Please select Mainnet Blockchain");
             }
-
-            //const result = await transferToken(tokenAddress, receiverAddress, amount);
-            //console.log(result);
-            //alert('Transfer successful!');
         } catch (error) {
             console.error(error);
             alert(error);
