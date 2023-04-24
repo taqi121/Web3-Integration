@@ -1,0 +1,95 @@
+﻿
+@*<script src="https://cdn.jsdelivr.net/npm/tronweb/dist/tronweb.min.js"></script>*@
+
+
+<div id="bg">
+</div>
+<div>
+    @*<div class="div-field">
+        <button onclick="connectToTronWallet()" class="btn">Connect with Tron Wallet</button>
+    </div>
+    <div class="div-field">
+        <button onclick="connect()" class="btn">Connect to TronWeb</button>
+    </div>*@
+    <div class="div-field">
+        <button onclick="connectWithTronLink()" class="btn">Connect with TronLink</button>
+    </div>
+    <div class="div-field">
+        <p id="status"></p>
+    </div>
+</div>
+
+
+@*<input type="text" id="walletAddress" placeholder="Wallet Address" disabled>*@
+@*<script src="https://cdn.jsdelivr.net/npm/tronweb/dist/tronweb.js"></script>*@
+@*<script src="https://cdn.jsdelivr.net/npm/@tronweb/tronweb@2.9.0/dist/tronweb.min.js"></script>*@
+<script src="https://cdn.tronlink.org/tronweb.js"></script>
+
+<script>
+
+    const TRONGRID_API = 'https://api.trongrid.io';
+    const tronWeb = new TronWeb({
+        fullHost: TRONGRID_API,
+        eventServer: TRONGRID_API,
+    });
+    //var tronWeb;
+    function connect() {
+        if (typeof window.tronWeb !== 'undefined') {
+            tronWeb = window.tronWeb;
+            console.log(tronWeb);
+        } else {
+            alert("Please install TronLink or TronPay extension!");
+        }
+    }
+
+    async function connectToTronWallet() {
+        if (typeof window.tronWeb !== 'undefined') {
+            const tronWebState = await window.tronWeb.isConnected();
+            if (tronWebState) {
+                console.log('Connected to Tron Wallet');
+            } else {
+                console.log('Not connected to Tron Wallet');
+            }
+        } else {
+            console.log('Tron Wallet not found');
+        }
+    }
+    async function connectWithTronLink() {
+        if (window.tronWeb && window.tronWeb.defaultAddress.base58) {
+            // TronLink is installed and the user is logged in
+            //const state = window.tronWeb.isConnected();
+            //if (tronWebState) {
+            //    console.log('Connected to Tron Wallet');
+            //} else {
+            //    console.log('Not connected to Tron Wallet');
+            //}
+            const address = window.tronWeb.defaultAddress.base58;
+            alert(`Successfully connected with TronLink. Address: ${address}`);
+        } else {
+            // TronLink is not installed or the user is not logged in
+            alert('Please install and log in to TronLink to connect.');
+        }
+    }
+    //async function connectWithTronWallet() {
+    //    try {
+    //        // Check if TronWeb is installed
+    //        if (typeof window.tronWeb === 'undefined') {
+    //            throw new Error('TronWeb not installed.');
+    //        }
+
+    //        // Check if the user is logged in to Tron Wallet
+    //        const loggedIn = await window.tronWeb.ready;
+    //        if (!loggedIn) {
+    //            throw new Error('User not logged in to Tron Wallet.');
+    //        }
+
+    //        // Get the user's wallet address
+    //        const address = window.tronWeb.defaultAddress.base58;
+    //        document.getElementById('walletAddress').value = address;
+    //        document.getElementById('walletAddress').disabled = false;
+    //    } catch (error) {
+    //        console.error(error);
+    //        alert(error.message);
+    //    }
+    //}
+</script>

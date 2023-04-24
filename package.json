@@ -1,5 +1,5 @@
 {
   "dependencies": {
-    "web3": "^1.9.0"
+    "tronweb": "^5.1.0"
   }
 }
