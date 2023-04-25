@@ -1,18 +1,21 @@
-﻿
-@*<script src="https://cdn.jsdelivr.net/npm/tronweb/dist/tronweb.min.js"></script>*@
+﻿@*<script src="https://cdn.jsdelivr.net/npm/tronweb/dist/tronweb.min.js"></script>*@
 
 
 <div id="bg">
 </div>
 <div>
-    @*<div class="div-field">
-        <button onclick="connectToTronWallet()" class="btn">Connect with Tron Wallet</button>
+    <div class="div-field">
+        <label>TRX Balance</label>
+        <p id="balance"></p>
     </div>
     <div class="div-field">
-        <button onclick="connect()" class="btn">Connect to TronWeb</button>
-    </div>*@
+        <input type="text" placeholder="Reciever" id="reciever" required />
+    </div>
     <div class="div-field">
-        <button onclick="connectWithTronLink()" class="btn">Connect with TronLink</button>
+        <input type="number" placeholder="Amount" id="amountsent" required />
+    </div>
+    <div class="div-field">
+        <button onclick="connectWithTronLink()" class="btn">Connect and Transfer</button>
     </div>
     <div class="div-field">
         <p id="status"></p>
@@ -27,11 +30,11 @@
 
 <script>
 
-    const TRONGRID_API = 'https://api.trongrid.io';
-    const tronWeb = new TronWeb({
-        fullHost: TRONGRID_API,
-        eventServer: TRONGRID_API,
-    });
+    //const TRONGRID_API = 'https://api.trongrid.io';
+    //const tronWeb = new TronWeb({
+    //    fullHost: TRONGRID_API,
+    //    eventServer: TRONGRID_API,
+    //});
     //var tronWeb;
     function connect() {
         if (typeof window.tronWeb !== 'undefined') {
@@ -55,41 +58,53 @@
         }
     }
     async function connectWithTronLink() {
+        const receiverAddress = document.getElementById('reciever').value;
+        const amount = document.getElementById('amountsent').value;
         if (window.tronWeb && window.tronWeb.defaultAddress.base58) {
-            // TronLink is installed and the user is logged in
-            //const state = window.tronWeb.isConnected();
-            //if (tronWebState) {
-            //    console.log('Connected to Tron Wallet');
-            //} else {
-            //    console.log('Not connected to Tron Wallet');
-            //}
+            //TronLink is installed and the user is logged in
+            const state = window.tronWeb.isConnected();
+            if (state) {
+                console.log('Connected to Tron Wallet');
+            } else {
+                console.log('Not connected to Tron Wallet');
+            }
             const address = window.tronWeb.defaultAddress.base58;
-            alert(`Successfully connected with TronLink. Address: ${address}`);
+            //alert(`Successfully connected with TronLink. Address: ${address}`);
+            var testamount = amount * 1000000;
+            alert(testamount);
+
+            let tx = await window.tronWeb.transactionBuilder.sendTrx(receiverAddress, testamount, address);
+            var signedTx = await window.tronWeb.trx.sign(tx);
+            var brostTx = await window.tronWeb.trx.sendRawTransaction(signedTx);
+            alert("Amount Transfer Successfully");
+            //let balance = tronWeb.trx.getBalance(address);
+            //const balanceInTRX = tronWeb.fromSun(balance);
+            //alert(balanceInTRX);
         } else {
             // TronLink is not installed or the user is not logged in
             alert('Please install and log in to TronLink to connect.');
         }
     }
-    //async function connectWithTronWallet() {
-    //    try {
-    //        // Check if TronWeb is installed
-    //        if (typeof window.tronWeb === 'undefined') {
-    //            throw new Error('TronWeb not installed.');
-    //        }
+        //async function connectWithTronWallet() {
+        //    try {
+        //        // Check if TronWeb is installed
+        //        if (typeof window.tronWeb === 'undefined') {
+        //            throw new Error('TronWeb not installed.');
+        //        }
 
-    //        // Check if the user is logged in to Tron Wallet
-    //        const loggedIn = await window.tronWeb.ready;
-    //        if (!loggedIn) {
-    //            throw new Error('User not logged in to Tron Wallet.');
-    //        }
+        //        // Check if the user is logged in to Tron Wallet
+        //        const loggedIn = await window.tronWeb.ready;
+        //        if (!loggedIn) {
+        //            throw new Error('User not logged in to Tron Wallet.');
+        //        }
 
-    //        // Get the user's wallet address
-    //        const address = window.tronWeb.defaultAddress.base58;
-    //        document.getElementById('walletAddress').value = address;
-    //        document.getElementById('walletAddress').disabled = false;
-    //    } catch (error) {
-    //        console.error(error);
-    //        alert(error.message);
-    //    }
-    //}
+        //        // Get the user's wallet address
+        //        const address = window.tronWeb.defaultAddress.base58;
+        //        document.getElementById('walletAddress').value = address;
+        //        document.getElementById('walletAddress').disabled = false;
+        //    } catch (error) {
+        //        console.error(error);
+        //        alert(error.message);
+        //    }
+        //}
 </script>
