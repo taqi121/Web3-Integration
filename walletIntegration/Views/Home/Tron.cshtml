@@ -13,7 +13,7 @@
 </div>
 <div style="display:none;" id="checkdiv">
     <div class="div-field">
-        <label>TRX Balance</label>
+        <label>TRC20-USDT Balance</label>
         <p id="balance"></p>
     </div>
     <div class="div-field">
@@ -23,7 +23,7 @@
         <input type="number" placeholder="Amount" id="amountsent" required />
     </div>
     <div class="div-field">
-        <button onclick="connectWithTronLink()" class="btn">Connect and Transfer</button>
+        <button onclick="connectWithTronLink()" class="btn">Transfer</button>
     </div>
     <div class="div-field">
         <p id="status"></p>
@@ -33,8 +33,53 @@
 <script src="https://cdn.tronlink.org/tronweb.js"></script>
 
 <script>
+    const usdtTrc20 = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t";
 
     async function connectWithTronLink() {
+
+        const senderAddress = window.tronWeb.defaultAddress.base58; // sender's address
+        const receiverAddress = document.getElementById('reciever').value; // receiver's address
+        const amount = document.getElementById('amountsent').value; // amount to transfer in USDT
+
+        if (window.tronWeb && window.tronWeb.defaultAddress.base58) {
+            // TronLink is installed and the user is logged in
+            const state = window.tronWeb.isConnected();
+            if (state) {
+                console.log("Connected to Tron Wallet");
+            } else {
+                console.log("Not connected to Tron Wallet");
+            }
+            const address = window.tronWeb.defaultAddress.base58;
+
+            // Get the contract instance
+            const contract = await window.tronWeb.contract().at(usdtTrc20);
+
+            // Convert the amount to the token's smallest unit (e.g., 1 USDT = 1000000 sun)
+            const tokenAmount = amount * 1000000;
+
+            try {
+                // Send the token transfer transaction
+                const result = await contract.transfer(receiverAddress, tokenAmount).send({
+                    shouldPollResponse: true,
+                    feeLimit: 100000000,
+                    callValue: 0,
+                    tokenId: 0,
+                    from: senderAddress,
+                });
+
+                console.log(result);
+                alert("USDT transfer successful!");
+            } catch (error) {
+                console.error(error);
+                alert("USDT transfer failed.");
+            }
+        } else {
+            // TronLink is not installed or the user is not logged in
+            alert("Please install and log in to TronLink to connect.");
+        }
+    }
+
+    async function connectWithTronLinkandGetBalance() {
         const receiverAddress = document.getElementById('reciever').value;
         const amount = document.getElementById('amountsent').value;
         if (window.tronWeb && window.tronWeb.defaultAddress.base58) {
@@ -46,20 +91,26 @@
                 console.log('Not connected to Tron Wallet');
             }
             const address = window.tronWeb.defaultAddress.base58;
-            //alert(`Successfully connected with TronLink. Address: ${address}`);
-            var testamount = amount * 1000000;
 
-            let tx = await window.tronWeb.transactionBuilder.sendTrx(receiverAddress, testamount, address);
-            var signedTx = await window.tronWeb.trx.sign(tx);
-            var brostTx = await window.tronWeb.trx.sendRawTransaction(signedTx);
-            alert("Amount Transfer Successfully");
+            const contractAddress = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t";
+            const tokenInstance = await window.tronWeb.contract().at(contractAddress);
+            const decimals = await tokenInstance.decimals().call();
+            const balance = await tokenInstance.balanceOf(address).call();
+            const usdtBalance = balance / Math.pow(10, decimals);
+            console.log("USDT-TRC20 Balance: ", usdtBalance);
+            //alert(usdtBalance)
+            document.getElementById("getMessage").style.visibility = "hidden";
+            document.getElementById("checkdiv").style.display = "block";
+            document.getElementById("balance").innerText = `${usdtBalance}`;
+
         } else {
             // TronLink is not installed or the user is not logged in
             alert('Please install and log in to TronLink to connect.');
         }
     }
 
-    async function connectWithTronLinkandGetBalance() {
+
+    async function connectWithTronLinkandGetBalanceTRX() {
         const receiverAddress = document.getElementById('reciever').value;
         const amount = document.getElementById('amountsent').value;
         if (window.tronWeb && window.tronWeb.defaultAddress.base58) {
@@ -79,11 +130,38 @@
                     //console.log(balance);
                     var balanceInNumber = balance / 1000000;
                     document.getElementById("getMessage").style.visibility = "hidden";
-                //document.getElementById("checkdiv").style.visibility = "visible";
-                document.getElementById("checkdiv").style.display = "block";
+                    //document.getElementById("checkdiv").style.visibility = "visible";
+                    document.getElementById("checkdiv").style.display = "block";
                     document.getElementById("balance").innerText = `${balanceInNumber}`;
                 }
             });
+        } else {
+            // TronLink is not installed or the user is not logged in
+            alert('Please install and log in to TronLink to connect.');
+        }
+    }
+
+    
+
+    async function TransferTRX() {
+        const receiverAddress = document.getElementById('reciever').value;
+        const amount = document.getElementById('amountsent').value;
+        if (window.tronWeb && window.tronWeb.defaultAddress.base58) {
+            //TronLink is installed and the user is logged in
+            const state = window.tronWeb.isConnected();
+            if (state) {
+                console.log('Connected to Tron Wallet');
+            } else {
+                console.log('Not connected to Tron Wallet');
+            }
+            const address = window.tronWeb.defaultAddress.base58;
+            //alert(`Successfully connected with TronLink. Address: ${address}`);
+            var testamount = amount * 1000000;
+            console.log(receiverAddress, amount, usdtTrc20, address);
+            let tx = await window.tronWeb.transactionBuilder.sendTrx(receiverAddress, testamount, address);
+            var signedTx = await window.tronWeb.trx.sign(tx);
+            var brostTx = await window.tronWeb.trx.sendRawTransaction(signedTx);
+            alert("Amount Transfer Successfully");
         } else {
             // TronLink is not installed or the user is not logged in
             alert('Please install and log in to TronLink to connect.');
