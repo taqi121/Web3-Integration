@@ -36,6 +36,12 @@
         <button onclick="transfer()" class="btn">Transfer</button>
     </div>
     <div class="div-field">
+        <input type="text" placeholder="TxHash" id="transactionHash" required />
+    </div>
+    <div class="div-field">
+        <button onclick="checkTransactions()" class="btn">Check Hash</button>
+    </div>
+    <div class="div-field">
         <p id="status"></p>
     </div>
 </div>
@@ -228,7 +234,7 @@
                     //alert(TokenBalance);
                     const check = await tokenTransfer(USDTPolygon, account, receiverAddress, amountinBig);
                     //alert(check);
-                    alert("Amount Transferred Successfully");
+                    alert("Amount Transferred Successfully: ", check);
                 }
                 else {
                     alert('Amount is greater than Balance');
@@ -244,7 +250,7 @@
                     //alert(TokenBalance);
                     const check = await tokenTransfer(USDTETH, account, receiverAddress, amountinBig);
                     //alert(check);
-                    alert("Amount Transferred Successfully");
+                    alert("Amount Transferred Successfully: ", check);
                 }
                 else {
                     alert('Amount is greater than Balance');
@@ -260,7 +266,7 @@
                     //alert(TokenBalance);
                     const check = await tokenTransfer(USDTBNB, account, receiverAddress, amountinBig);
                     //alert(check);
-                    alert("Amount Transferred Successfully");
+                    alert("Amount Transferred Successfully: ", check);
                 }
                 else {
                     alert('Amount is greater than Balance');
@@ -275,6 +281,36 @@
             alert('Transfer failed. Please try again later.');
         }
     };
+
+    const checkTransactions = async () => {
+        try {
+            let hash = document.getElementById('transactionHash').value;
+
+            await checkTransactionStatus(hash);
+            
+        } catch (error) {
+            console.error(error);
+            alert(error);
+            alert('Transfer failed. Please try again later.');
+        }
+    };
+
+    async function checkTransactionStatus(transactionHash) {
+        try {
+            const receipt = await window.web3.eth.getTransactionReceipt(transactionHash);
+            if (receipt) {
+                alert('Transaction confirmed!');
+                //console.log(receipt);
+                // The transaction is confirmed
+            } else {
+                alert('Transaction not yet confirmed');
+                // The transaction is not yet confirmed
+            }
+        } catch (error) {
+            console.log('Error checking transaction status');
+            console.error(error);
+        }
+    }
 
     function disconnectFromMetaMask() {
         // Check if MetaMask is installed
