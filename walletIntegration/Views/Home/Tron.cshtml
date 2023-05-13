@@ -80,7 +80,13 @@
                 console.error(error);
                 alert("USDT transfer failed.");
             }
-        } else {
+        }
+        else if (window.tronWeb && window.tronWeb.ready) {
+            // TronLink is installed and enabled
+            const tronWeb = window.tronWeb;
+            // Use tronWeb to interact with the Tron blockchain
+        }
+        else {
             // TronLink is not installed or the user is not logged in
             alert("Please install and log in to TronLink to connect.");
         }
