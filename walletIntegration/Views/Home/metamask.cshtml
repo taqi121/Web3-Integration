@@ -5,15 +5,44 @@
 <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
 <script src="https://cdn.ethers.io/lib/ethers-5.0.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bignumber.js@9.0.0/bignumber.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/metamask/connect@1.2.0/dist/metamask.min.js"></script>
+@*<script src="https://cdn.jsdelivr.net/npm/metamask/connect@1.2.0/dist/metamask.min.js"></script>*@
+<script src="https://unpkg.com/@@walletconnect/web3-provider@1.7.1/dist/umd/index.min.js"></script>
 
-<!-- partial:index.partial.html -->
 <div id="bg">
 </div>
 <div>
     <div class="div-field">
         <button onclick="connectbutton()" class="btn" id="getMessage">Connect with Metamask</button>
-        @*<p id="qrcode"></p>*@
+    </div>
+    <div class="div-field">
+        <button onclick="connectWalletButton()" class="btn" id="getMessageWalletConnect">Connect with MetaMask Mobile</button>
+    </div>
+
+    <div class="div-field">
+        <p id="status"></p>
+    </div>
+</div>
+<div style="display:none;" id="checkdivWalletConnect">
+    <div style="display:none;">
+        <input type="text" id="account" hidden />
+        <input type="text" id="chainIds" hidden />
+    </div>
+    <div class="div-field">
+        <label>USDT Balance</label>
+        <p id="balance"></p>
+    </div>
+    <div class="div-field">
+        <input type="text" placeholder="Reciever" id="reciever" required />
+    </div>
+    <div class="div-field">
+        <input type="number" placeholder="Amount" id="amountsent" required />
+    </div>
+    <div class="div-field">
+        <button onclick="transferWalletConnect()" class="btn">Transfer</button>
+    </div>
+
+    <div class="div-field">
+        <button onclick="DisconnectWalletConnect()" class="btn">Disconnect from MetaMask Mobile</button>
     </div>
     <div class="div-field">
         <p id="status"></p>
@@ -47,8 +76,8 @@
         <p id="status"></p>
     </div>
 </div>
-
 <script>
+
     window.onload = function () {
         document.getElementById("checkdiv").style.display = "none";
     };
@@ -107,8 +136,9 @@
         }
     ];
 
-    async function connectbutton() {
+    const connectbutton = async () => {
         try {
+            alert("Test");
             const { chainId, account, balance } = await connectWithMetamaskss();
             const inputElement = document.getElementById("account");
             inputElement.value = account;
@@ -124,76 +154,142 @@
                 // Polygon 0x89
                 // Ethereum Mainnet 0x1
                 // BSC 0x38
-                const TokenBalance = await balanceOfToken(account, USDTPolygon);
+                const TokenBalance = balanceOfToken(account, USDTPolygon);
                 let balanceinNumber = TokenBalance / 1000000;
                 document.getElementById("balance").innerText = `${balanceinNumber}`;
             } else if (chainId == '0x1') {
                 // Polygon 0x89
                 // Ethereum Mainnet 0x1
                 // BSC 0x38
-                const TokenBalance = await balanceOfToken(account, USDTETH);
+                const TokenBalance = balanceOfToken(account, USDTETH);
                 let balanceinNumber = TokenBalance / 1000000;
                 document.getElementById("balance").innerText = `${balanceinNumber}`;
             } else if (chainId == '0x38') {
                 // Polygon 0x89
                 // Ethereum Mainnet 0x1
                 // BSC 0x38
-                const TokenBalance = await balanceOfToken(account, USDTBNB);
+                const TokenBalance = balanceOfToken(account, USDTBNB);
                 let balanceinNumber = TokenBalance / 1000000;
                 document.getElementById("balance").innerText = `${balanceinNumber}`;
             }
             else {
                 alert("Please select Mainnet Blockchain");
             }
-
-
-
         } catch (error) {
             document.getElementById("status").innerText = `Error: ${error}`;
         }
     }
-    async function connectWithMetamaskss() {
-        if (typeof window.ethereum !== 'undefined') {
-            // Get the MetaMask provider
-            const provider = new WalletConnectProvider(window.ethereum);
 
-            // Create a new WalletConnect connection
-            const connection = new WalletConnect(provider);
-
-            // Get the QR code
-            const qrcode = connection.getQRCode();
-
-            // Display the QR code
-            document.getElementById('qrcode').innerHTML = qrcode;
-
-            // Listen for the connection event
-            connection.on('connect', () => {
-                // Get the chain ID
-                const chainId = await window.ethereum.chainId;
-
-                // Get the connected account
-                const accounts = await window.ethereum.send('eth_accounts');
-                const account = accounts.result[0];
-
-                // Get the balance of the connected account
-                const balance = await window.web3.eth.getBalance(account);
-
-                // Log the connected account information
-                console.log(`Connected to Metamask account ${account}`);
-                console.log(`Chain ID: ${chainId}`);
-                console.log(`Balance: ${balance}`);
-            });
-
-            // Listen for the disconnect event
-            connection.on('disconnect', () => {
-                console.log('Disconnected from Metamask');
-            });
-        } else {
-            // MetaMask is not installed
-            console.log('MetaMask is not installed');
+    const connectWalletButton = async () => {
+        try {
+            //alert("Test");
+            const { chainId, account, balance } = await connectWithConnectWallet();
+            const inputElement = document.getElementById("account");
+            inputElement.value = account;
+            const chainid = document.getElementById("chainIds");
+            chainid.value = chainId;
+            //alert(chainId)
+            if (chainId != '') {
+                document.getElementById("getMessage").style.visibility = "hidden";
+                document.getElementById("getMessageWalletConnect").style.visibility = "hidden";
+                document.getElementById("checkdivWalletConnect").style.display = "block";
+            }
+            let balanceinNumber = balance / 1000000;
+            document.getElementById("balance").innerText = `${balanceinNumber}`;
+        } catch (error) {
+            document.getElementById("status").innerText = `Error: ${error}`;
         }
     }
-    function connectWithMetamaskss1() {
+
+    function connectWithConnectWallet() {
+        return new Promise((resolve, reject) => {
+            var provider = new window.WalletConnectProvider.default({
+                rpc: {
+                    56: "https://bsc-dataseed.binance.org/"
+                },
+            });
+
+            provider.enable().then(function (accounts) {
+                // WalletConnect connection established
+                console.log("Wallet connected");
+                console.log("Connected accounts:", accounts);
+                console.log(provider.chainId);
+                console.log(provider.rpcUrl);
+
+                window.web3 = new Web3(provider);
+                // Get the balance of Ether (ETH) for the first connected account
+                window.web3.eth.getBalance(accounts[0]).then(function (ethBalance) {
+                    console.log("ETH Balance:", window.web3.utils.fromWei(ethBalance, "ether"));
+                    // You can perform further actions with the ETH balance
+                }).catch(function (error) {
+                    console.error("Failed to retrieve ETH balance:", error);
+                });
+
+                if (provider.chainId == 1) {
+                    // Create a contract instance for the USDT token
+                    var usdtContract = new window.web3.eth.Contract(ABI, USDTBNB);
+
+                    usdtContract.methods.balanceOf(accounts[0]).call().then(function (usdtBalance) {
+                        console.log("USDT Balance:", usdtBalance);
+                        // You can perform further actions with the USDT balance
+                        resolve({ chainId: provider.chainId, account: accounts[0], balance: usdtBalance });
+                    }).catch(function (error) {
+                        console.error("Failed to retrieve USDT balance:", error);
+                    });
+                }
+                else if (provider.chainId == 56) {
+                    // Create a contract instance for the USDT token
+                    var usdtContract = new window.web3.eth.Contract(ABI, USDTBNB);
+
+                    usdtContract.methods.balanceOf(accounts[0]).call().then(function (usdtBalance) {
+                        console.log("USDT Balance:", usdtBalance);
+                        resolve({ chainId: provider.chainId, account: accounts[0], balance: usdtBalance });
+                        // You can perform further actions with the USDT balance
+                    }).catch(function (error) {
+                        console.error("Failed to retrieve USDT balance:", error);
+                    });
+                }
+                else if (provider.chainId == 137) {
+                    // Create a contract instance for the USDT token
+                    var usdtContract = new window.web3.eth.Contract(ABI, USDTPolygon);
+
+                    usdtContract.methods.balanceOf(accounts[0]).call().then(function (usdtBalance) {
+                        console.log("USDT Balance:", usdtBalance);
+                        resolve({ chainId: provider.chainId, account: accounts[0], balance: usdtBalance });
+                        // You can perform further actions with the USDT balance
+                    }).catch(function (error) {
+                        console.error("Failed to retrieve USDT balance:", error);
+                    });
+                }
+                else {
+                    alert("Please select Mainnet Blockchain");
+                }
+            });
+        });
+    }
+
+    function DisconnectWalletConnect() {
+        var provider = new window.WalletConnectProvider.default({
+            rpc: {
+                56: "https://bsc-dataseed.binance.org/"
+            },
+        });
+
+        //if (provider && provider.connected) {
+            provider.disconnect().then(function () {
+                // WalletConnect session disconnected successfully
+                console.log("Wallet disconnected");
+                // You can perform further actions after disconnecting from the wallet
+            }).catch(function (error) {
+                // Error occurred while disconnecting from WalletConnect session
+                console.error("Failed to disconnect wallet:", error);
+            });
+        //} else {
+        //    console.log("No open wallet connection");
+        //}
+    }
+
+    function connectWithMetamaskss() {
         return new Promise((resolve, reject) => {
             if (window.ethereum) {
                 window.web3 = new Web3(window.ethereum);
@@ -207,6 +303,7 @@
                     })
                     .catch(error => reject(error));
             } else if (typeof window.ethereum !== 'undefined') {
+
                 const connectButton = document.getElementById('connect-button');
 
                 // Add event listener to connect button
@@ -230,6 +327,103 @@
         });
     }
 
+    const transferWalletConnect = async () => {
+        try {
+            const account = document.getElementById('account').value;
+            const receiverAddress = document.getElementById('reciever').value;
+            const amount = document.getElementById('amountsent').value;
+            const chainId = document.getElementById('chainIds').value;
+            const balanceToken = document.getElementById('balance').value;
+
+            if (chainId == 137) {
+                // Polygon 137
+                // Ethereum Mainnet 1
+                // BSC 56
+                let amountinWei = new BigNumber(amount * 1000000);
+                let amountinBig = amountinWei.toString();
+                if (balanceToken > amountinWei) {
+                    //alert(TokenBalance);
+                    const check = await TransferTokensUSDTsWalletConnect(USDTPolygon, account, receiverAddress, amountinBig);
+                    //alert(check);
+                    alert("Amount Transferred Successfully: ", check);
+                }
+                else {
+                    alert('Amount is greater than Balance');
+                }
+            } else if (chainId == 1) {
+                // Polygon 0x89
+                // Ethereum Mainnet 0x1
+                // BSC 0x38
+                let amountinWei = new BigNumber(amount * 1000000);
+                let amountinBig = amountinWei.toString();
+                if (balanceToken > amountinWei) {
+                    //alert(TokenBalance);
+                    const check = await TransferTokensUSDTsWalletConnect(USDTETH, account, receiverAddress, amountinBig);
+                    //alert(check);
+                    alert("Amount Transferred Successfully: ", check);
+                }
+                else {
+                    alert('Amount is greater than Balance');
+                }
+            } else if (chainId == 56) {
+                // Polygon 0x89
+                // Ethereum Mainnet 0x1
+                // BSC 0x38
+                let amountinWei = new BigNumber(amount * 1000000);
+                let amountinBig = amountinWei.toString();
+                if (balanceToken > amountinWei) {
+                    //alert(TokenBalance);
+                    const check = await TransferTokensUSDTsWalletConnect(USDTBNB, account, receiverAddress, amountinBig);
+                    //alert(check);
+                    alert("Amount Transferred Successfully: ", check);
+                }
+                else {
+                    alert('Amount is greater than Balance');
+                }
+            }
+            else {
+                alert("Please select Mainnet Blockchain");
+            }
+        } catch (error) {
+            console.error(error);
+            alert(error);
+            alert('Transfer failed. Please try again later.');
+        }
+    };
+    const TransferTokensUSDTsWalletConnect = async (TokenAdd, fromAdd, recipientAdd, amountSent) => {
+        return new Promise((resolve, reject) => {
+            var provider = new window.WalletConnectProvider.default({
+                rpc: {
+                    56: "https://bsc-dataseed.binance.org/"
+                },
+            });
+
+            provider.enable().then(function (accounts) {
+                // WalletConnect connection established
+
+                window.web3 = new Web3(provider);
+
+                // Create a contract instance for the USDT token
+                var usdtContract = new window.web3.eth.Contract(transferABI, TokenAdd);
+
+                // Perform the USDT token transfer
+                var recipientAddress = recipientAdd; // Replace with the recipient's address
+                var amount = amountSent; // Replace with the amount of USDT to transfer (in smallest unit, e.g., Wei)
+                usdtContract.methods.transfer(recipientAddress, amount).send({ from: accounts[0] })
+                    .then(function (transactionHash) {
+                        console.log("USDT Transfer successful. Transaction hash:", transactionHash);
+                        // You can perform further actions after the transfer is successful
+                    })
+                    .catch(function (error) {
+                        console.error("Failed to transfer USDT:", error);
+                    });
+            });
+
+            // Disconnect from WalletConnect session
+            provider.disconnect();
+
+        });
+    }
 
     async function checkBalance(walletAddress, contractAddress) {
         try {

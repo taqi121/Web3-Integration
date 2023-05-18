@@ -5,11 +5,10 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
-
+  <!--<PackageReference Include="@walletconnect/client" Version="1.7.3" />-->
   <ItemGroup>
     <None Include="wwwroot\lib\Style.css" />
   </ItemGroup>
-
   <ItemGroup>
     <Folder Include="Scripts\" />
   </ItemGroup>
