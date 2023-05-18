@@ -138,7 +138,6 @@
 
     const connectbutton = async () => {
         try {
-            alert("Test");
             const { chainId, account, balance } = await connectWithMetamaskss();
             const inputElement = document.getElementById("account");
             inputElement.value = account;
@@ -147,6 +146,7 @@
             //alert(chainId)
             if (chainId != '') {
                 document.getElementById("getMessage").style.visibility = "hidden";
+                document.getElementById("getMessageWalletConnect").style.visibility = "hidden";
                 //document.getElementById("checkdiv").style.visibility = "visible";
                 document.getElementById("checkdiv").style.display = "block";
             }
