@@ -205,7 +205,10 @@
         return new Promise((resolve, reject) => {
             var provider = new window.WalletConnectProvider.default({
                 rpc: {
-                    56: "https://bsc-dataseed.binance.org/"
+                    56: "https://bsc-dataseed.binance.org/",
+                    137: "https://polygon-mainnet.infura.io/",
+                    1: "https://mainnet.infura.io/v3/",
+                    8457: "https://dataseed-testnet.redlightscan.finance/"
                 },
             });
 
@@ -268,7 +271,7 @@
         });
     }
 
-    function DisconnectWalletConnect() {
+    const DisconnectWalletConnect = async () => {
         var provider = new window.WalletConnectProvider.default({
             rpc: {
                 56: "https://bsc-dataseed.binance.org/"
@@ -276,17 +279,45 @@
         });
 
         //if (provider && provider.connected) {
-            provider.disconnect().then(function () {
-                // WalletConnect session disconnected successfully
-                console.log("Wallet disconnected");
-                // You can perform further actions after disconnecting from the wallet
-            }).catch(function (error) {
-                // Error occurred while disconnecting from WalletConnect session
-                console.error("Failed to disconnect wallet:", error);
-            });
+        await provider.disconnect().then(function () {
+            // WalletConnect session disconnected successfully
+            console.log("Wallet disconnected");
+            // You can perform further actions after disconnecting from the wallet
+        }).catch(function (error) {
+            // Error occurred while disconnecting from WalletConnect session
+            console.error("Failed to disconnect wallet:", error);
+        });
         //} else {
         //    console.log("No open wallet connection");
         //}
+
+        return new Promise((resolve, reject) => {
+            var provider = new window.WalletConnectProvider.default({
+                rpc: {
+                    56: "https://bsc-dataseed.binance.org/",
+                    137: "https://polygon-mainnet.infura.io/",
+                    1: "https://mainnet.infura.io/v3/",
+                },
+            });
+
+            provider.enable().then(function (accounts) {
+                // WalletConnect connection established
+
+                window.web3 = new Web3(provider);
+
+                // Create a contract instance for the USDT token
+                var usdtContract = new window.web3.eth.Contract(transferABI, TokenAdd);
+
+                // Perform the USDT token transfer
+                var recipientAddress = recipientAdd; // Replace with the recipient's address
+                var amount = amountSent; // Replace with the amount of USDT to transfer (in smallest unit, e.g., Wei)
+            });
+
+            // Disconnect from WalletConnect session
+            //provider.disconnect();
+            window.location.reload();
+        });
+        window.location.reload();
     }
 
     function connectWithMetamaskss() {
@@ -381,9 +412,6 @@
                     alert('Amount is greater than Balance');
                 }
             }
-            else {
-                alert("Please select Mainnet Blockchain");
-            }
         } catch (error) {
             console.error(error);
             alert(error);
@@ -394,7 +422,9 @@
         return new Promise((resolve, reject) => {
             var provider = new window.WalletConnectProvider.default({
                 rpc: {
-                    56: "https://bsc-dataseed.binance.org/"
+                    56: "https://bsc-dataseed.binance.org/",
+                    137: "https://polygon-mainnet.infura.io/",
+                    1: "https://mainnet.infura.io/v3/",
                 },
             });
 
@@ -409,18 +439,22 @@
                 // Perform the USDT token transfer
                 var recipientAddress = recipientAdd; // Replace with the recipient's address
                 var amount = amountSent; // Replace with the amount of USDT to transfer (in smallest unit, e.g., Wei)
+                var txHash = "";
                 usdtContract.methods.transfer(recipientAddress, amount).send({ from: accounts[0] })
                     .then(function (transactionHash) {
                         console.log("USDT Transfer successful. Transaction hash:", transactionHash);
+                        txHash = transactionHash;
                         // You can perform further actions after the transfer is successful
+                        alert("Transaction Confirmed ", txHash);
                     })
                     .catch(function (error) {
                         console.error("Failed to transfer USDT:", error);
                     });
+
             });
 
             // Disconnect from WalletConnect session
-            provider.disconnect();
+            //provider.disconnect();
 
         });
     }
