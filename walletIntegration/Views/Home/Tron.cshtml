@@ -1,5 +1,7 @@
 ﻿@*<script src="https://cdn.jsdelivr.net/npm/tronweb/dist/tronweb.min.js"></script>*@
 <script src="https://unpkg.com/@@walletconnect/web3-provider@1.7.1/dist/umd/index.min.js"></script>
+@*<script src="https://cdn.jsdelivr.net/npm/@@walletconnect/web3-provider@1.6.4/dist/web3-provider.min.js"></script>*@
+<script src="https://cdn.jsdelivr.net/npm/web3@1.6.1/dist/web3.min.js"></script>
 
 <div id="bg">
 </div>
@@ -8,7 +10,7 @@
         <button onclick="connectWithTronLinkandGetBalance()" class="btn" id="getMessage">Connect with TronLink</button>
     </div>
     <div class="div-field">
-        <button onclick="connectWalletButton()" class="btn" id="getMessageWalletConnect">Connect with Tron Mobile</button>
+        <button onclick="connectWithTronLinkTest()" class="btn" id="getMessageWalletConnect">Connect with Tron Mobile</button>
     </div>
     <div class="div-field">
         <p id="status"></p>
@@ -397,5 +399,128 @@
             // TronLink is not installed or the user is not logged in
             alert('Please install and log in to TronLink to connect.');
         }
+    }
+    function connectWithTronLinkTest() {
+        const providerOptions = {
+            rpc: {
+                fullHost: 'https://api.nileex.io' // Tron blockchain API endpoint
+            }
+        };
+
+        const provider = new window.WalletConnectProvider.default(providerOptions);
+
+        // Enable session request and chain changed event
+        provider.enable().then(function (accounts) {
+            console.log("Wallet connected");
+            console.log("Connected accounts:", accounts);
+            console.log(provider.chainId);
+            console.log(provider.rpcUrl);
+
+            // Inject the provider into the web3 instance
+            const web3 = new Web3(provider);
+
+            // Use the web3 instance to interact with the Tron blockchain
+            // For example, you can get the current wallet address
+            web3.eth.getAccounts().then(function (accounts) {
+                const walletAddress = accounts[0];
+                console.log('Wallet address:', walletAddress);
+
+                // You can perform additional actions with the wallet address
+                // For example, update UI or fetch user data based on the address
+
+                // To get the balance of the wallet address
+                web3.eth.getBalance(walletAddress).then(function (balance) {
+                    console.log('Balance:', balance);
+                }).catch(function (error) {
+                    console.error('Error getting balance:', error);
+                });
+            }).catch(function (error) {
+                console.error('Error getting accounts:', error);
+            });
+        });
+
+        // Subscribe to session connection event
+        provider.on('connect', (error, payload) => {
+            if (error) {
+                throw error;
+            }
+
+            // Get the current chainId from payload.params[0].chainId
+            const { chainId } = payload.params[0];
+            console.log('Connected to chain:', chainId);
+
+            // You can perform additional actions after connection
+            // For example, display a connected message or load user data
+        });
+
+        // Subscribe to session disconnection event
+        provider.on('disconnect', (error, payload) => {
+            if (error) {
+                throw error;
+            }
+
+            // Handle disconnection
+            console.log('Disconnected');
+
+            // You can perform additional actions after disconnection
+            // For example, display a disconnected message or update UI
+        });
+    }
+    function connectWithTronLinkTest1() {
+        const providerOptions = {
+            rpc: {
+                fullHost: 'https://api.nileex.io' // Tron blockchain API endpoint
+            }
+        };
+
+        const provider = new window.WalletConnectProvider.default(providerOptions);
+
+        // Enable session request and chain changed event
+        provider.enable().then(function (accounts){
+            console.log("Wallet connected");
+            console.log("Connected accounts:", accounts);
+            console.log(provider.chainId);
+            console.log(provider.rpcUrl);
+        });
+
+        // Subscribe to session connection event
+        provider.on('connect', (error, payload) => {
+            if (error) {
+                throw error;
+            }
+
+            // Get the current chainId from payload.params[0].chainId
+            const { chainId } = payload.params[0];
+            console.log('Connected to chain:', chainId);
+
+            // You can perform additional actions after connection
+            // For example, display a connected message or load user data
+        });
+
+        // Subscribe to session disconnection event
+        provider.on('disconnect', (error, payload) => {
+            if (error) {
+                throw error;
+            }
+
+            // Handle disconnection
+            console.log('Disconnected');
+
+            // You can perform additional actions after disconnection
+            // For example, display a disconnected message or update UI
+        });
+
+        //// Inject the provider into the web3 instance
+        //const web3 = new Web3(provider);
+
+        //// Use the web3 instance to interact with the Tron blockchain
+        //// For example, you can get the current wallet address
+        //web3.eth.getAccounts().then(accounts => {
+        //    const walletAddress = accounts[0];
+        //    console.log('Wallet address:', walletAddress);
+
+        //    // You can perform additional actions with the wallet address
+        //    // For example, update UI or fetch user data based on the address
+        //});
     }
 </script>

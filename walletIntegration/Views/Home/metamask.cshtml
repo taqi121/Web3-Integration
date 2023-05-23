@@ -76,6 +76,7 @@
         <p id="status"></p>
     </div>
 </div>
+
 <script>
 
     window.onload = function () {
@@ -135,7 +136,6 @@
             "type": "function"
         }
     ];
-
     const connectbutton = async () => {
         try {
             const { chainId, account, balance } = await connectWithMetamaskss();
@@ -179,7 +179,6 @@
             document.getElementById("status").innerText = `Error: ${error}`;
         }
     }
-
     const connectWalletButton = async () => {
         try {
             //alert("Test");
@@ -200,7 +199,6 @@
             document.getElementById("status").innerText = `Error: ${error}`;
         }
     }
-
     function connectWithConnectWallet() {
         return new Promise((resolve, reject) => {
             var provider = new window.WalletConnectProvider.default({
@@ -269,7 +267,6 @@
             });
         });
     }
-
     const DisconnectWalletConnect = async () => {
         var provider = new window.WalletConnectProvider.default({
             rpc: {
@@ -296,6 +293,7 @@
                     56: "https://bsc-dataseed.binance.org/",
                     137: "https://polygon-mainnet.infura.io/",
                     1: "https://mainnet.infura.io/v3/",
+                    8457: "https://dataseed-testnet.redlightscan.finance/"
                 },
             });
 
@@ -318,7 +316,6 @@
         });
         window.location.reload();
     }
-
     function connectWithMetamaskss() {
         return new Promise((resolve, reject) => {
             if (window.ethereum) {
@@ -356,7 +353,6 @@
             }
         });
     }
-
     const transferWalletConnect = async () => {
         try {
             const account = document.getElementById('account').value;
@@ -371,7 +367,7 @@
                 // BSC 56
                 let amountinWei = new BigNumber(amount * 1000000);
                 let amountinBig = amountinWei.toString();
-                if (balanceToken > amountinWei) {
+                if (balanceToken > amount) {
                     //alert(TokenBalance);
                     const check = await TransferTokensUSDTsWalletConnect(USDTPolygon, account, receiverAddress, amountinBig);
                     //alert(check);
@@ -386,7 +382,7 @@
                 // BSC 0x38
                 let amountinWei = new BigNumber(amount * 1000000);
                 let amountinBig = amountinWei.toString();
-                if (balanceToken > amountinWei) {
+                if (balanceToken > amount) {
                     //alert(TokenBalance);
                     const check = await TransferTokensUSDTsWalletConnect(USDTETH, account, receiverAddress, amountinBig);
                     //alert(check);
@@ -401,7 +397,7 @@
                 // BSC 0x38
                 let amountinWei = new BigNumber(amount * 1000000);
                 let amountinBig = amountinWei.toString();
-                if (balanceToken > amountinWei) {
+                if (balanceToken > amount) {
                     //alert(TokenBalance);
                     const check = await TransferTokensUSDTsWalletConnect(USDTBNB, account, receiverAddress, amountinBig);
                     //alert(check);
@@ -457,7 +453,6 @@
 
         });
     }
-
     async function checkBalance(walletAddress, contractAddress) {
         try {
             const balance = await balanceOfToken(walletAddress, contractAddress);
@@ -466,7 +461,6 @@
             document.getElementById("statusb").innerText = `Error: ${error}`;
         }
     }
-
     function balanceOfToken(walletAddress, contractAddress) {
         return new Promise((resolve, reject) => {
             const contract = new window.web3.eth.Contract(ABI, contractAddress);
@@ -475,7 +469,6 @@
                 .catch(err => reject(err));
         });
     }
-
     const tokenTransfer = async (TokenAdd, fromAdd, recipientAdd, amountSent) => {
         const tokenAddress = TokenAdd;
 
@@ -503,7 +496,6 @@
         console.log(`Transaction hash: ${txHash}`);
         //alert(txHash);
     }
-
     const transfer = async () => {
         try {
             const account = document.getElementById('account').value;
@@ -569,7 +561,6 @@
             alert('Transfer failed. Please try again later.');
         }
     };
-
     const checkTransactions = async () => {
         try {
             let hash = document.getElementById('transactionHash').value;
@@ -582,7 +573,6 @@
             alert('Transfer failed. Please try again later.');
         }
     };
-
     async function checkTransactionStatus(transactionHash) {
         try {
             const receipt = await window.web3.eth.getTransactionReceipt(transactionHash);
@@ -599,7 +589,6 @@
             console.error(error);
         }
     }
-
     function disconnectFromMetaMask() {
         // Check if MetaMask is installed
         if (typeof window.ethereum !== 'undefined') {
