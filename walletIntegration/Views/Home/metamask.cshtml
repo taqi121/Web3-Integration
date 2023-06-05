@@ -78,9 +78,9 @@
 </div>
 
 <script>
-
     window.onload = function () {
         document.getElementById("checkdiv").style.display = "none";
+
     };
     const USDTETH = "0xdAC17F958D2ee523a2206206994597C13D831ec7";
     const USDTBNB = "0x55d398326f99059fF775485246999027B3197955";
@@ -203,9 +203,9 @@
         return new Promise((resolve, reject) => {
             var provider = new window.WalletConnectProvider.default({
                 rpc: {
-                    56: "https://bsc-dataseed.binance.org/",
-                    137: "https://polygon-mainnet.infura.io/",
-                    1: "https://mainnet.infura.io/v3/",
+                    56: "https://bsc-dataseed.binance.org",
+                    137: "https://polygon-rpc.com",
+                    1: "https://mainnet.infura.io/v3",
                 },
             });
 
@@ -418,7 +418,7 @@
             var provider = new window.WalletConnectProvider.default({
                 rpc: {
                     56: "https://bsc-dataseed.binance.org/",
-                    137: "https://polygon-mainnet.infura.io/",
+                    137: "https://polygon-rpc.com",
                     1: "https://mainnet.infura.io/v3/",
                 },
             });
