@@ -205,7 +205,8 @@
                 rpc: {
                     56: "https://bsc-dataseed.binance.org",
                     137: "https://polygon-rpc.com",
-                    1: "https://mainnet.infura.io/v3",
+                    //1: "https://mainnet.infura.io/v3",
+                    1: "https://ethereum.publicnode.com",
                 },
             });
 
@@ -227,7 +228,7 @@
 
                 if (provider.chainId == 1) {
                     // Create a contract instance for the USDT token
-                    var usdtContract = new window.web3.eth.Contract(ABI, USDTBNB);
+                    var usdtContract = new window.web3.eth.Contract(ABI, USDTETH);
 
                     usdtContract.methods.balanceOf(accounts[0]).call().then(function (usdtBalance) {
                         console.log("USDT Balance:", usdtBalance);
@@ -419,7 +420,8 @@
                 rpc: {
                     56: "https://bsc-dataseed.binance.org/",
                     137: "https://polygon-rpc.com",
-                    1: "https://mainnet.infura.io/v3/",
+                    //1: "https://mainnet.infura.io/v3/",
+                    1: "https://ethereum.publicnode.com",
                 },
             });
 
